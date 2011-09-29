@@ -3,13 +3,8 @@
 -export([parse_transform/2]).
 
 parse_transform(AST, Options) ->
-    case log_backend(Options) of
-        {ok, Module} when is_atom(Module) ->
-            put(log_backend, Module),
-            walk_ast([], AST);
-        _ ->
-            AST
-    end.
+    (Module = log_backend(Options)) andalso put(log_backend, Module),
+    walk_ast([], AST).
 
 walk_ast(Acc, []) ->
     lists:reverse(Acc);
@@ -43,7 +38,7 @@ statement({call, Line,
             {atom, Line3, Level}},
            Args}) ->
     case get(log_backend) of
-        undefined ->
+        false ->
             call_metal_log(Level, Args, Line, Line1, Line2, Line3);
         Module ->
             call_backend_log(Module, Level, Args, Line, Line1, Line2, Line3)
@@ -63,7 +58,7 @@ call_metal_log(Level, Args, Line, Line1, Line2, Line3) ->
       {call, Line3, {atom, Line3 ,self}, []} | Args]}.
 
 log_backend([]) ->
-    undefined;
+    false;
 log_backend([{d, log_backend, Module}|_]) ->
     {ok, Module};
 log_backend([_|T]) ->
