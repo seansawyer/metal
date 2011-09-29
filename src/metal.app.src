@@ -1,0 +1,10 @@
+{application, metal,
+ [
+  {description, "An Erlang metalogger"},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]}
+ ]}.
