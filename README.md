@@ -27,11 +27,11 @@ Do not define the log_backend macro or application environment variable. This wi
 
 Enable the Metal parse_transform in your application as described above.
 
-Next, tell Metal which module contains the log_transform to use by adding a macro definition to your compiler flags :
+Next, tell Metal which module contains the implementation of `log_transform/2` to use by adding a macro definition to your compiler flags :
 
     {d, log_backend, metal_error_logger}
 
-Finally, define an application environment variable to tell Metal which module provides logging at runtime, perhaps by adding the following to your `app.config` or `sys.config` file:
+Finally, define an application environment variable to tell Metal which module provides the runtime interface to your log backend, perhaps by adding the following to your `app.config` or `sys.config` file:
 
     {metal, [{log_backend, metal_error_logger}]}
 

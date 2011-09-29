@@ -3,9 +3,9 @@
 -export([parse_transform/2]).
 
 parse_transform(AST, Options) ->
-    case log_transform(Options) of
-        {ok, Transform} when is_atom(Transform) ->
-            put(log_transform, Transform),
+    case log_backend(Options) of
+        {ok, Module} when is_atom(Module) ->
+            put(log_backend, Module),
             walk_ast([], AST);
         _ ->
             AST
@@ -42,7 +42,7 @@ statement({call, Line,
             {atom, Line2, metal},
             {atom, Line3, Level}},
            Args}) ->
-    case get(log_transform) of
+    case get(log_backend) of
         undefined ->
             call_metal_log(Level, Args, Line, Line1, Line2, Line3);
         Module ->
@@ -62,9 +62,9 @@ call_metal_log(Level, Args, Line, Line1, Line2, Line3) ->
       {integer, Line3, Line},
       {call, Line3, {atom, Line3 ,self}, []} | Args]}.
 
-log_transform([]) ->
+log_backend([]) ->
     undefined;
-log_transform([{d, log_transform, LogTransform}|_]) ->
-    {ok, LogTransform};
-log_transform([_|T]) ->
-    log_transform(T).
+log_backend([{d, log_backend, Module}|_]) ->
+    {ok, Module};
+log_backend([_|T]) ->
+    log_backend(T).
