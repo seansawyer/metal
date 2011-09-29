@@ -6,9 +6,7 @@
 
 parse_transform_test_() ->
     [{"With no backend, transform metal:LEVEL/N calls to metal:log/4",
-      fun() ->
-          file:open("../priv/transform_no_backend_in.erl", [read]) 
-      end},
+      ?_assertMatch(ok, ok)},
      {"With error_logger backend, transform metal:LEVEL/N to error_logger:F/N",
       ?_assertMatch(ok, ok)},
      {"With lager backend, transform metal:LEVEL/N to lager:F/N",

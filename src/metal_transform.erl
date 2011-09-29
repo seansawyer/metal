@@ -38,7 +38,7 @@ statement({call, Line,
             {atom, Line3, Level}},
            Args}) ->
     case get(log_backend) of
-        false ->
+        undefined ->
             call_metal_log(Level, Args, Line, Line1, Line2, Line3);
         Module ->
             call_backend_log(Module, Level, Args, Line, Line1, Line2, Line3)
