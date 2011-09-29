@@ -50,7 +50,7 @@ statement({call, Line,
     end.
             
 call_backend_log(Module, Level, Args, Line, Line1, Line2, Line3) ->
-    {M,F,A} = apply(Module, log_transform, [Level, Args]),
+    {M,F,A} = apply(Module, call_transform, [Level, Args]),
     {call, Line, {remote, Line1, {atom, Line2, M}, {atom, Line3, F}}, A}. 
 
 call_metal_log(Level, Args, Line, Line1, Line2, Line3) ->
