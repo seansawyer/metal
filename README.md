@@ -12,12 +12,13 @@ Thanks to the authors of [Lager](https://github.com/basho/lager), whose parse tr
 
 ## Notes for those using Lager ##
 
+* You must use the per-file compiler attributes rather than the compiler attribute for now. Sorry!
 * When adding parse transforms, be sure to add `metal_transform` __before__ `lager_transform`.
 * Don't skip `metal_transform`. If you do, Lager's parse transform won't see any calls to Lager, and you'll lose its nice short-circuiting when the requested level is not enabled.
 
 ## Usage in library applications ##
 
-Just enable the Metal parse_transform during compilation by doing one of the following:
+Just enable the Metal parse_transform during compilation by one of the following:
 
 * Add the parse_transform to your compiler flags: `{parse_transform, metal_transform}`
 * Add a compiler attribute to your module: `-compile([{parse_transform, metal_transform}]).`
