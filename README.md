@@ -1,12 +1,14 @@
 # Metal, an Erlang metalogger #
 
-Metal lets you defer the decision of how your application does logging. It supports both the parse_transform approach used by something like Lager, as well as runtime logging. Metal supplies its own parse_transform to collect module/function/line information in order to supply it to your log backend later. This was  is implemented as a Erlang parse_transform. Out-of-the-box support for the following logging libraries is or will shortly be included:
+Metal lets you defer the decision of when and how your application does logging. It supplies a parse_transform to collect module/function/line information in order to supply it to your log backend later, and falls back to runtime logging when that information is unavailable. Out-of-the-box support for the following logging libraries is included:
 
 * [error_logger](http://www.erlang.org/doc/man/error_logger.html) - meh
 * [lager](https://github.com/basho/lager) - my personal favorite, as it includes module/function/line information
 * [log4erl](https://github.com/ahmednawras/log4erl) - also gets the job done
 
 However, Metal does not introduce any dependencies on logging frameworks or other libraries.
+
+Thanks to the authors of [Lager](https://github.com/basho/lager), whose parse transform approach gave me the idea.
 
 ## Notes for those using Lager ##
 
