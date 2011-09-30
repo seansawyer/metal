@@ -51,7 +51,13 @@ statement({call, Line,
             call_metal_log(Level, Args, Line, Line1, Line2, Line3);
         Module ->
             call_backend_log(Module, Level, Args, Line, Line1, Line2, Line3)
-    end.
+    end;
+statement(Stmt) when is_tuple(Stmt) ->
+    list_to_tuple(statement(tuple_to_list(Stmt)));
+statement(Stmt) when is_list(Stmt) ->
+    [statement(S) || S <- Stmt];
+statement(Stmt) ->
+    Stmt.
             
 call_backend_log(Module, Level, Args, Line, Line1, Line2, Line3) ->
     {M,F} = apply(Module, call_transform, [Level]),
