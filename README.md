@@ -21,7 +21,7 @@ Thanks to the authors of [Lager](https://github.com/basho/lager), whose parse tr
 Just enable the Metal parse_transform during compilation by one of the following:
 
 * Add the parse_transform to your compiler flags: `{parse_transform, metal_transform}`
-* Add a compiler attribute to your module: `-compile([{parse_transform, metal_transform}]).`
+* Add a compiler attribute to your modules: `-compile([{parse_transform, metal_transform}]).`
 
 Do not define the log_backend macro or application environment variable. This will be left to developers who use your application as a dependency.
 
@@ -40,15 +40,17 @@ You can stop here if you are feeling lazy, but you should really continue by con
 * adding the parse_transform to your compiler flags: `{parse_transform, metal_transform}`
 * or adding a compiler attribute to your modules: `-compile([{parse_transform, metal_transform}]).`
 
-Finally, tell Metal which module contains the implementation of `log_transform/2` to use by adding a macro definition to your compiler flags:
+Now tell Metal which log_backend module contains the implementation of `log_transform/2` you with to use by adding a macro definition to your compiler flags:
 
-    {d, log_backend, metal_error_logger}
+    {d, log_backend, metal_lager} %% assuming you are using lager - see below for more
 
-This tells Metal which module to use when transforming calls to metal:LEVEL/N into calls to your logging library of choice. The following are included with Metal:
+This module/function supplies the transformation of calls to metal:LEVEL/N into calls to your logging library of choice. The following log_backends are included with Metal:
 
 * [metal_error_logger](https://github.com/seansawyer/metal/blob/master/src/metal_error_logger.erl) - interface to error_logger
 * [metal_lager](https://github.com/seansawyer/metal/blob/master/src/metal_lager.erl) - interface to lager
 * [metal_log4erl](https://github.com/seansawyer/metal/blob/master/src/metal_log4erl.erl) - interfact to log4erl
+
+Finally, start metal (e.g., `application:start(metal).`) along with any applications associated with your logging library, and you are good to go.
 
 ## Writing your own log_backend ##
 
