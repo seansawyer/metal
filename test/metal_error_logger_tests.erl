@@ -20,10 +20,9 @@ call_transform_test_() ->
 call_transform_gen(Tests, []) ->
     Tests;
 call_transform_gen(Tests, [{Level, Function}|T]) ->
-    Args = ["~p", foo],
-    Desc = test_desc("Maps [~p, Args] to {error_logger, ~p, Args}",
+    Desc = test_desc("Maps ~p to {error_logger, ~p",
                      [Level, Function]),
     Test = {Desc, 
-            ?_assertMatch({error_logger, Function, Args},
-                          metal_error_logger:call_transform(Level, Args))},
+            ?_assertMatch({error_logger, Function},
+                          metal_error_logger:call_transform(Level))},
     call_transform_gen([Test|Tests], T).

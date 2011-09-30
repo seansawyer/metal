@@ -9,7 +9,7 @@
          error/1, error/2,
          fatal/1, fatal/2,
          info/1, info/2,
-         log/7,
+         log/6, log/7,
          notice/1, notice/2,
          warning/1, warning/2]).
 
@@ -66,6 +66,11 @@ warning(Message) ->
 
 warning(Format, Args) ->
     log(warning, Format, Args).
+
+%% @doc Called by lines resulting from application of the parse_transform
+%% when no log_backend macro is defined during compilation.
+log(Level, Module, Function, Line, Pid, Message) ->
+    log_backend([Level, Module, Function, Line, Pid, Message, []]).
 
 %% @doc Called by lines resulting from application of the parse_transform
 %% when no log_backend macro is defined during compilation.

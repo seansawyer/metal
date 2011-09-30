@@ -2,12 +2,21 @@
 
 -export([parse_transform/2]).
 
+-ifdef(TEST).
+-define(STORE_AST, true).
+-else.
+-define(STORE_AST, false).
+-endif.
+
 parse_transform(AST, Options) ->
-    (Module = log_backend(Options)) andalso put(log_backend, Module),
+    log_backend(Options),
+    ?STORE_AST andalso ets:insert(metal, {ast_in, AST}),
     walk_ast([], AST).
 
 walk_ast(Acc, []) ->
-    lists:reverse(Acc);
+    Result = lists:reverse(Acc),
+    ?STORE_AST andalso ets:insert(metal, {ast_out, Result}),
+    Result;
 walk_ast(Acc, [{attribute, _, module, {Module, _PmodArgs}}=H|T]) ->
     put(module, Module),
     walk_ast([H|Acc], T);
@@ -45,8 +54,8 @@ statement({call, Line,
     end.
             
 call_backend_log(Module, Level, Args, Line, Line1, Line2, Line3) ->
-    {M,F,A} = apply(Module, call_transform, [Level, Args]),
-    {call, Line, {remote, Line1, {atom, Line2, M}, {atom, Line3, F}}, A}. 
+    {M,F} = apply(Module, call_transform, [Level]),
+    {call, Line, {remote, Line1, {atom, Line2, M}, {atom, Line3, F}}, Args}. 
 
 call_metal_log(Level, Args, Line, Line1, Line2, Line3) ->
     {call, Line,
@@ -60,6 +69,7 @@ call_metal_log(Level, Args, Line, Line1, Line2, Line3) ->
 log_backend([]) ->
     false;
 log_backend([{d, log_backend, Module}|_]) ->
-    {ok, Module};
+    put(log_backend, Module),
+    Module;
 log_backend([_|T]) ->
     log_backend(T).

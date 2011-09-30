@@ -1,6 +1,6 @@
 -module(metal_lager).
 
--export([call_transform/2,
+-export([call_transform/1,
          log/4,
          log/7]).
 
@@ -12,11 +12,19 @@ log(Level, Module, Function, Line, Pid, Format, Args) ->
     Time = lager_util:maybe_utc(lager_util:localtime_ms()),
     lager:log(Level1, Module, Function, Line, Pid, Time, Format, Args).
 
-call_transform(Level, Args) ->
-    {lager, level_function(Level), Args}.
+call_transform(Level) ->
+    {lager, level_function(Level)}.
 
 level_function(Level) ->
     case Level of
-        fatal -> emergency;
-        Other -> Other
+        debug     -> debug;
+        info      -> info;
+        notice    -> notice;
+        warning   -> warning;
+        error     -> error;
+        fatal     -> emergency;
+        critical  -> critical;
+        alert     -> alert;
+        emergency -> emergency;
+        _ -> info
     end.
