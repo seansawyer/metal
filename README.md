@@ -8,20 +8,16 @@ Metal lets you defer the decision of when and how your application does logging.
 
 However, Metal does not introduce any dependencies on logging frameworks or other libraries.
 
-Thanks to the authors of [Lager](https://github.com/basho/lager), whose parse transform approach gave me the idea.
+To get started, add Metal to the `deps` list in your `rebar.config`:
 
-## Notes for those using Lager ##
-
-* You must use the per-file compiler attributes rather than the compiler attribute for now. Sorry!
-* When adding parse transforms, be sure to add `metal_transform` __before__ `lager_transform`.
-* Don't skip `metal_transform`. If you do, Lager's parse transform won't see any calls to Lager, and you'll lose its nice short-circuiting when the requested level is not enabled.
+    {'metal', ".*", {git, "git://github.com/seansawyer/metal.git", "master"}}
 
 ## Usage in library applications ##
 
-Just enable the Metal parse_transform during compilation by one of the following:
+Just enable the Metal parse_transform during compilation by doing one of the following:
 
-* Add the parse_transform to your compiler flags: `{parse_transform, metal_transform}`
-* Add a compiler attribute to your modules: `-compile([{parse_transform, metal_transform}]).`
+* Adding the parse_transform to your compiler flags: `{parse_transform, metal_transform}`. If you have some method of forcing this on users of your library, like a Rebar config file, this is a good option. 
+* Adding a compiler attribute to your modules: `-compile([{parse_transform, metal_transform}]).` There are various reasons you might choose this; one is discussed below.
 
 Do not define the log_backend macro or application environment variable. This will be left to developers who use your application as a dependency.
 
@@ -29,16 +25,18 @@ Do not define the log_backend macro or application environment variable. This wi
 
 First, define an application environment variable to tell Metal which module provides the runtime interface to your logging library, perhaps by adding the following to your `app.config` or `sys.config` file like so:
 
-    {metal, [{log_backend, metal_error_logger}]}
+    {metal, [{log_backend, metal_lager}]}
 
 Or by setting it with `application:set_env/3` if you prefer:
 
-    application:set_env(metal, log_backend, metal_error_logger).
+    application:set_env(metal, log_backend, metal_lager).
 
-You can stop here if you are feeling lazy, but you should really continue by configuring the parse transform. There are downsides to being lazy, though, and you will lose module/line/function info (as well as short-circuiting in Lager - see above). Anyway, since you're not lazy, add the parse transform by either:
+If you don't plan to use your application as a library embedded in another application, you are done. Use your logging library of choice as usual, and you should automagically start seeing log output from any dependencies that play nice with Metal.
 
-* adding the parse_transform to your compiler flags: `{parse_transform, metal_transform}`
-* or adding a compiler attribute to your modules: `-compile([{parse_transform, metal_transform}]).`
+If you do plan to use your application as a library elsewhere, you might consider doing your logging through Metal and configuring the parse transform to call through to your logging framework.
+
+* Either add the parse_transform to your compiler flags: `{parse_transform, metal_transform}`
+* Adding a compiler attribute to your modules: `-compile([{parse_transform, metal_transform}]).` I think you'll have to go this route if you are using lager
 
 Now tell Metal which log_backend module contains the implementation of `log_transform/2` you with to use by adding a macro definition to your compiler flags:
 
@@ -52,6 +50,12 @@ This module/function supplies the transformation of calls to metal:LEVEL/N into 
 
 Finally, start metal (e.g., `application:start(metal).`) along with any applications associated with your logging library, and you are good to go.
 
+## Notes for those using both Lager and Metal parse transforms ##
+
+* You must use the per-file `-compile` attributes rather than the compiler option attribute for now. Sorry!
+* When adding parse transforms, be sure to add `metal_transform` __before__ `lager_transform`.
+* Don't skip `metal_transform`. If you do, Lager's parse transform won't see any calls to Lager, and you'll lose its nice short-circuiting when the requested level is not enabled.
+
 ## Writing your own log_backend ##
 
 More info on this soon, but you can probably figure it out by looking at the modules listed above.
@@ -59,3 +63,7 @@ More info on this soon, but you can probably figure it out by looking at the mod
 ## Forcing a log backend in a library application ##
 
 It is not recommended to do so, but it should be possible to force a log backend when writing a library application. You would need to bundle the dependency with your application to prevent errors. Then simply follow the directions for a top-level application above. This is currently untested, but like I said it's not recommended. Why would you be using Metal in that case anyway?
+
+## Thanks! ##
+
+Many thanks to the authors of [Lager](https://github.com/basho/lager), whose parse transform approach inspired this.
